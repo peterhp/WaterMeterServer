@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core
+QT       += core network
 
 QT       -= gui
 
@@ -23,7 +23,10 @@ SOURCES += main.cpp \
     protocol/wmp/wmp.c \
     test/test_buffer.cpp \
     test/test_crc.cpp \
-    util/crc.c
+    util/crc.c \
+    server/wm_server.cpp \
+    client/wm_client.cpp \
+    test/test_client_server.cpp
 
 HEADERS += \
     buffer/buffer.h \
@@ -34,4 +37,7 @@ HEADERS += \
     util/crc.h \
     util/errors.h \
     util/macros.h \
-    types.h
+    types.h \
+    config.h \
+    server/server.h \
+    client/client.h

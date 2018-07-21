@@ -28,7 +28,7 @@ class Buffer {
 
 class BlockBuffer : public Buffer {
     public: 
-        BlockBuffer(uint init_size = BUFFER_SIZE_DEFAULT);
+        explicit BlockBuffer(uint init_size = BUFFER_SIZE_DEFAULT);
         ~BlockBuffer();
 
         uint buf_size() const;
@@ -50,7 +50,7 @@ class BlockBuffer : public Buffer {
 
 class CircularBuffer : public Buffer {
     public: 
-        CircularBuffer(uint init_size = BUFFER_SIZE_DEFAULT);
+        explicit CircularBuffer(uint init_size = BUFFER_SIZE_DEFAULT);
         ~CircularBuffer();
 
         uint buf_size() const;
