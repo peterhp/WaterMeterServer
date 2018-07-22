@@ -24,6 +24,8 @@ typedef struct wm_context {
     byte *data;
 } wm_cxt;
 
+extern void wm_cxt_destroy(wm_cxt **cxt);
+
 #ifdef __cplusplus
 }
 #endif

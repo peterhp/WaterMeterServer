@@ -3,7 +3,9 @@
 
 #include "types.h"
 #include "config.h"
+#include "protocol/wm_context.h"
 #include "server/conn_manager.h"
+#include "server/pack_manager.h"
 
 #include <QObject>
 #include <QTimer>
@@ -33,6 +35,12 @@ private:
     QTimer *timer;
 
     ConnManager *conns;
+
+private:
+    void parsePacket(const QTcpSocket *socket);
+    wm_cxt *composeData(const QTcpSocket *socket);
+
+    PackManager *packs;
 };
 
 #endif // server.h

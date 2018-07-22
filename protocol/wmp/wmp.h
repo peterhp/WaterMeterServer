@@ -42,6 +42,8 @@ typedef struct wmp_packet {
     uint16  postfix;        // ED ED
 } wmp_pkt;
 
+extern int wmp_pack_min_size();
+
 extern int wmp_pack_size(const byte *hdr, uint len);
 
 extern int wmp_serialize(byte *buf, const wmp_pkt *pkt, uint blen);
@@ -61,6 +63,7 @@ extern wmp_plist *wmp_build_packets(const wm_cxt *cxt);
 // compose data from received packets
 extern int wmp_compose_packet(wmp_plist *plist, wmp_pkt *pkt);
 extern void wmp_compose_data(wm_cxt *cxt, wmp_plist *plist);
+extern bool wmp_is_composed(const wmp_plist *plist);
 
 extern void destroy_wmp_packets(wmp_plist **plist);
 

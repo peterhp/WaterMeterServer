@@ -41,7 +41,7 @@ private:
         }
 
         inline Buffer *getBuf() const {return buf;}
-        inline QMutex &getLocker() const {return rwLocker;}
+        inline QMutex &getLocker() {return rwLocker;}
 
         inline void updateConn() {lastConn = CUR_TIME();}
         inline bool isTimeout(uint timeout) const {
@@ -69,6 +69,10 @@ public:
                 connections.value(socket)->isTimeout(timeout);
     }
     void removeAllTimeout(uint timeout);
+
+    inline Buffer *getBuffer(const QTcpSocket *socket) const {
+        return connections.value(socket)->getBuf();
+    }
 
 private:
     QHash<const QTcpSocket *, ConnPrivate *> connections;

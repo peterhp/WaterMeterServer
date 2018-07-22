@@ -1,5 +1,10 @@
 #include "types.h"
 #include "client/client.h"
+#include "protocol/wmp/wmp.h"
+#include "protocol/wm_context.h"
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include <QObject>
 #include <QString>
@@ -42,19 +47,55 @@ void WMClient::close() {
     }
 }
 
+wmp_plist *WMClient::construct(const QByteArray &data) const {
+    wm_cxt *cxt = (wm_cxt *)malloc(sizeof(wm_cxt));
+    memset(cxt, 0, sizeof(wm_cxt));
+
+    cxt->data = (byte *)malloc(sizeof(data.length()));
+    memcpy(cxt->data, data.constData(), data.length());
+    cxt->dlen = data.length();
+
+    memcpy(cxt->hub_id, "TEST", strlen("TEST"));
+    memcpy(cxt->wm_id, "ID", strlen("ID"));
+
+    cxt->type = WMD_C2S_HEARTBEAT;
+
+    wmp_plist *plist = wmp_build_packets(cxt);
+    wm_cxt_destroy(&cxt);
+
+    return plist;
+}
+
 bool WMClient::send(const QByteArray &data) {
+    byte *temp = (byte *)malloc(sizeof(byte) * 1024);
+    bool sent = false;
+
     if (socket->state() == QTcpSocket::ConnectedState) {
-        socket->write(data);
-        if (socket->waitForBytesWritten()) {
-            return true;
+        wmp_plist *plist = this->construct(data);
+
+        sent = true;
+        for (int pi = 0; pi < plist->count; ++pi) {
+            int dlen = wmp_serialize(temp, plist->plist[pi], 1024);
+
+            socket->write((char *)temp, dlen);
+            if (!socket->waitForBytesWritten()) {
+                sent = false;
+                break;
+            }
         }
+
+        destroy_wmp_packets(&plist);
     }
 
-    qWarning() << QString("Client [%1] failed to send data to Server. Error: %2")
-                .arg(client_id)
-                .arg(socket->errorString());
+    free(temp);
 
-    return false;
+    if (!sent) {
+        qWarning() << QString("Client [%1] failed to send data to Server. Error: %2")
+                    .arg(client_id)
+                    .arg(socket->errorString());
+    }
+
+    return sent;
 }
 
 void WMClient::onReceived() {

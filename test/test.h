@@ -13,6 +13,8 @@ extern void test_circular_buffer();
 extern void test_single_client_server();
 extern void test_multi_client_server();
 
+extern void test_wm_server();
+
 static inline void test_all() { 
     test_crc16();
 
@@ -21,6 +23,8 @@ static inline void test_all() {
 
     test_single_client_server();
     test_multi_client_server();
+
+    test_wm_server();
 }
 
 #ifdef __cplusplus

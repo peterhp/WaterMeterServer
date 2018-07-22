@@ -2,6 +2,7 @@
 #define _QPT_HEADER_WATER_METER_TEST_CLIENT_H_
 
 #include "types.h"
+#include "protocol/wmp/wmp.h"
 
 #include <QObject>
 #include <QString>
@@ -24,6 +25,9 @@ public:
     void close();
 
     bool send(const QByteArray &data);
+
+private:
+    wmp_plist *construct(const QByteArray &data) const;
 
 private slots:
     void onReceived();

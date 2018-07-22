@@ -1,6 +1,10 @@
 #include "types.h"
+#include "buffer/buffer.h"
+#include "protocol/wmp/wmp.h"
 #include "server/server.h"
 #include "server/conn_manager.h"
+
+#include <stdlib.h>
 
 #include <QObject>
 #include <QTcpServer>
@@ -14,11 +18,13 @@ WMServer::WMServer(QObject *parent) : QObject(parent) {
     server = new QTcpServer(this);
     timer = new QTimer(this);
     conns = ConnManager::getManager();
+    packs = new PackManager;
 }
 
 WMServer::~WMServer() {
     this->close();
     conns->removeManager();
+    delete packs;
 }
 
 bool WMServer::start(uint16 port) {
@@ -77,10 +83,16 @@ void WMServer::onReceived() {
 
     conns->append(socket, data);
 
-    socket->write(QString("Reply from Server to Client [%1:%2].")
-                  .arg(socket->peerAddress().toString())
-                  .arg(socket->peerPort())
-                  .toUtf8());
+    this->parsePacket(socket);
+    wm_cxt *cxt = this->composeData(socket);
+    if (cxt) {
+        socket->write(QString("Reply from Server to Client [%1:%2].")
+                      .arg(socket->peerAddress().toString())
+                      .arg(socket->peerPort())
+                      .toUtf8());
+    }
+
+    wm_cxt_destroy(&cxt);
 }
 
 void WMServer::onDisconnected() {
@@ -93,6 +105,7 @@ void WMServer::onDisconnected() {
     socket->close();
 
     conns->remove(socket);
+    packs->remove(socket);
 
     disconnect(socket, &QTcpSocket::readyRead, this, &WMServer::onReceived);
     disconnect(socket, &QTcpSocket::disconnected, this, &WMServer::onDisconnected);
@@ -101,4 +114,33 @@ void WMServer::onDisconnected() {
 void WMServer::onTimer() {
     // Remove dead socket connections
     conns->removeAllTimeout(DEFAULT_CONN_TIMEOUT);
+    packs->removeAllTimeout(DEFAULT_CONN_TIMEOUT);
+}
+
+void WMServer::parsePacket(const QTcpSocket *socket) {
+    Buffer *buf = conns->getBuffer(socket);
+
+    byte temp[1024];
+    while (buf->data_size() >= wmp_pack_min_size()) {
+        buf->peek(temp, WMP_HEAD_LEN);
+        uint pack_size = wmp_pack_size(temp, WMP_HEAD_LEN);
+        if (buf->data_size() < pack_size) {
+            break;
+        }
+
+        // Read the whole packet
+        buf->read(temp, pack_size);
+        wmp_pkt *packet = (wmp_pkt *)malloc(sizeof(wmp_pkt));
+
+        // Parse & validate the packet
+        if (wmp_deserialize(packet, temp, pack_size) > 0) {
+            packs->put(socket, packet);
+        } else {
+            free(packet);
+        }
+    }
+}
+
+wm_cxt *WMServer::composeData(const QTcpSocket *socket) {
+    return packs->compose(socket);
 }

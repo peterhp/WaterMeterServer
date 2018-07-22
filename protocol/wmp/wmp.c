@@ -10,6 +10,10 @@
 
 #include "protocol/wmp/wmp.h"
 
+int wmp_pack_min_size() {
+    return WMP_HEAD_LEN + WMP_TAIL_LEN;
+}
+
 int wmp_pack_size(const byte *hdr, uint len) {
     if (len < WMP_HEAD_LEN) {
         return ERROR_INVALID_PACKET_LEN;
@@ -87,6 +91,8 @@ static uint wmp_pack(wmp_pkt *pkt, const wm_cxt *cxt, uint pnum, uint32 ts) {
     pkt->data_len = MIN(cxt->dlen - pos, WMP_MAX_DATA_SIZE);
     memcpy(pkt->data, cxt->data + WMP_MAX_DATA_SIZE * pos, pkt->data_len);
     pkt->check_sum = crc16(pkt->data, pkt->data_len);
+
+    pkt->postfix = WMP_POSTFIX;
     
     return pkt->data_len;
 }
@@ -127,6 +133,16 @@ int wmp_compose_packet(wmp_plist *plist, wmp_pkt *pkt) {
     }
 
     return WMP_COMPOSE_COMPLETED;
+}
+
+bool wmp_is_composed(const wmp_plist *plist) {
+    for (int pi = 0; pi < plist->count; ++pi) {
+        if (!plist->plist[pi]) {
+            return false;
+        }
+    }
+
+    return true;
 }
 
 static uint wmp_plist_data_len(const wmp_plist *plist) {

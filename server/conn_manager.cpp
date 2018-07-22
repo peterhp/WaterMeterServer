@@ -10,6 +10,8 @@ QT_USE_NAMESPACE
 
 ConnManager *ConnManager::instance = Q_NULLPTR;
 
+QMutex ConnManager::instLocker;
+
 ConnManager *ConnManager::getManager() {
     instLocker.lock();
 
@@ -51,7 +53,7 @@ void ConnManager::append(const QTcpSocket *socket, const QByteArray &data) {
 
     conn->updateConn();
     if (!data.isEmpty()) {
-        conn->getBuf()->write(data.data(), data.length());
+        conn->getBuf()->write((byte *)data.data(), data.length());
     }
 
     conn->getLocker().unlock();

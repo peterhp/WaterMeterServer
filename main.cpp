@@ -1,9 +1,17 @@
 #include <QCoreApplication>
 
 #include "test/test.h"
+#include "server/server.h"
 
 int main(int argc, char *argv[]) {
-    QCoreApplication a(aaa, aa);
+    QCoreApplication app(argc, argv);
 
-    return a.exec();
+    WMServer server(&app);
+    server.start(10000);
+
+    return app.exec();
+
+//    test_wm_server();
+
+//    return 0;
 }

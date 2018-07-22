@@ -27,12 +27,14 @@ SOURCES += main.cpp \
     server/wm_server.cpp \
     client/wm_client.cpp \
     test/test_client_server.cpp \
-    server/conn_manager.cpp
+    server/conn_manager.cpp \
+    server/pack_manager.cpp \
+    protocol/wm_context.c \
+    test/test_wm_server.cpp
 
 HEADERS += \
     buffer/buffer.h \
     protocol/wmp/wmp.h \
-    protocol/protocol.h \
     protocol/wm_context.h \
     test/test.h \
     util/crc.h \
@@ -42,4 +44,5 @@ HEADERS += \
     config.h \
     server/server.h \
     client/client.h \
-    server/conn_manager.h
+    server/conn_manager.h \
+    server/pack_manager.h
