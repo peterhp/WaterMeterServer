@@ -3,8 +3,10 @@
 
 #include "types.h"
 #include "config.h"
+#include "server/conn_manager.h"
 
 #include <QObject>
+#include <QTimer>
 #include <QTcpServer>
 
 QT_USE_NAMESPACE
@@ -24,8 +26,13 @@ private slots:
     void onReceived();
     void onDisconnected();
 
+    void onTimer();
+
 private:
     QTcpServer *server;
+    QTimer *timer;
+
+    ConnManager *conns;
 };
 
 #endif // server.h

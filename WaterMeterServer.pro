@@ -26,7 +26,8 @@ SOURCES += main.cpp \
     util/crc.c \
     server/wm_server.cpp \
     client/wm_client.cpp \
-    test/test_client_server.cpp
+    test/test_client_server.cpp \
+    server/conn_manager.cpp
 
 HEADERS += \
     buffer/buffer.h \
@@ -40,4 +41,5 @@ HEADERS += \
     types.h \
     config.h \
     server/server.h \
-    client/client.h
+    client/client.h \
+    server/conn_manager.h

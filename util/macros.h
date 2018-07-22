@@ -1,6 +1,8 @@
 #ifndef _QPT_HEADER_SELF_DEFINED_MACROS_H_
 #define _QPT_HEADER_SELF_DEFINED_MACROS_H_
 
+#include "types.h"
+
 #ifndef MAX
 #define MAX(x, y) ((x) > (y) ? (x) : (y))
 #endif
@@ -28,6 +30,12 @@
 
 #ifndef ALIGN_SIZE
 #define ALIGN_SIZE(size) (ALIGN_WIDTH * DIV_CEIL(size, ALIGN_WIDTH))
+#endif
+
+#include <time.h>
+
+#ifndef CUR_TIME
+#define CUR_TIME() ((uint32)time(NULL))
 #endif
 
 #endif // macros.h

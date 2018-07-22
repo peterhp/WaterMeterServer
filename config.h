@@ -3,5 +3,6 @@
 
 #define WM_SERVER_PORT 10001
 
+#define DEFAULT_CONN_TIMEOUT (1000 * 60 * 2)
 
 #endif // config.h
